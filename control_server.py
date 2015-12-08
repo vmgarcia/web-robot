@@ -11,11 +11,13 @@ class MyServerProtocol(WebSocketServerProtocol):
 	GPIO.setmode(GPIO.BCM)
 	self.leftmotor = Motor([12, 16, 20, 21])
 	self.leftmotor.rpm = 20
-	self.right_motor = Motor([18, 23, 24, 25])
-	self.right_motor.rpm = 20
+	self.rightmotor = Motor([18, 23, 24, 25])
+	self.rightmotor.rpm = 20
     	self.left_status = 0
 	self.right_status = 0
-	self.looping = None	
+	self.loopingl = None	
+	self.loopingr = None	
+
 
     def onConnect(self, request):
         print("Client connecting: {0}".format(request.peer))
@@ -29,11 +31,32 @@ class MyServerProtocol(WebSocketServerProtocol):
         else:
             print("Text message received: {0}".format(payload.decode('utf8')))
 	    if payload == "forward":
-		self.looping = LoopingCall(self.leftmotor.move_cw, 8)
-		self.looping.start(.01, now=True)
+		self.loopingl = LoopingCall(self.leftmotor.move_cw, 8)
+		self.loopingl.start(.01, now=True)
+		self.loopingr = LoopingCall(self.rightmotor.move_acw, 8)
+		self.loopingr.start(.01, now=True)
+	
 	    elif payload == "stop":
-		if self.looping != None and self.looping.running:
-		    self.looping.stop()
+		if self.loopingl != None and self.loopingl.running:
+		    self.loopingl.stop()
+		if self.loopingr != None and self.loopingr.running:
+		    self.loopingr.stop()
+	    elif payload == "left":
+		self.loopingl = LoopingCall(self.leftmotor.move_acw, 8)
+		self.loopingl.start(.01, now=True)
+		self.loopingr = LoopingCall(self.rightmotor.move_acw, 8)
+		self.loopingr.start(.01, now=True)
+	    elif payload == "right":
+		self.loopingl = LoopingCall(self.leftmotor.move_cw, 8)
+		self.loopingl.start(.01, now=True)
+		self.loopingr = LoopingCall(self.rightmotor.move_cw, 8)
+		self.loopingr.start(.01, now=True)
+	    elif payload == "reverse":
+		self.loopingl = LoopingCall(self.leftmotor.move_acw, 8)
+		self.loopingl.start(.01, now=True)
+		self.loopingr = LoopingCall(self.rightmotor.move_cw, 8)
+		self.loopingr.start(.01, now=True)
+	    
         #echo back message verbatim
         self.sendMessage(payload, isBinary)
 
