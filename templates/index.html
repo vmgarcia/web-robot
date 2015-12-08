@@ -9,7 +9,7 @@
 
          window.onload = function() {
 
-            socket = new WebSocket("ws://172.16.122.73:9000");
+            socket = new WebSocket("ws://{{ipaddress}}:9000");
             socket.binaryType = "arraybuffer";
 
             socket.onopen = function() {
