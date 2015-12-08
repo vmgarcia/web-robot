@@ -6,14 +6,18 @@ from flask import Flask, render_template, Response
 
 # Raspberry Pi camera module (requires picamera package)
 from camera_pi import Camera
-
+import socket
 app = Flask(__name__)
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("gmail.com",80))
+ip_address = s.getsockname()[0]
+s.close()
 
 @app.route('/')
 def index():
     """Video streaming home page."""
-    return render_template('index.html')
+    return render_template('index.html', ipaddress = ip_address)
 
 
 def gen(camera):
