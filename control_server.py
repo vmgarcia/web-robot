@@ -8,15 +8,16 @@ from twisted.internet.task import LoopingCall, CooperativeTask
 class MyServerProtocol(WebSocketServerProtocol):
 
     def __init__(self):
-	GPIO.setmode(GPIO.BCM)
-	self.leftmotor = Motor([12, 16, 20, 21])
-	self.leftmotor.rpm = 20
-	self.rightmotor = Motor([18, 23, 24, 25])
-	self.rightmotor.rpm = 20
-    	self.left_status = 0
-	self.right_status = 0
-	self.loopingl = None	
-	self.loopingr = None	
+        GPIO.setmode(GPIO.BCM)
+        self.leftmotor = Motor([12, 16, 20, 21])
+        self.leftmotor.rpm = 20
+        self.rightmotor = Motor([18, 23, 24, 25])
+        self.rightmotor.rpm = 20
+        self.left_status = 0
+        self.right_status = 0
+        self.loopingl = None    
+        self.loopingr = None    
+        self.rate = .02
 
 
     def onConnect(self, request):
@@ -30,39 +31,39 @@ class MyServerProtocol(WebSocketServerProtocol):
             print("Binary message received: {0} bytes".format(len(payload)))
         else:
             print("Text message received: {0}".format(payload.decode('utf8')))
-	    if payload == "forward":
-		self.loopingl = LoopingCall(self.leftmotor.move_cw, 8)
-		self.loopingl.start(.01, now=True)
-		self.loopingr = LoopingCall(self.rightmotor.move_acw, 8)
-		self.loopingr.start(.01, now=True)
-	
-	    elif payload == "stop":
-		if self.loopingl != None and self.loopingl.running:
+        if payload == "forward":
+            self.loopingl = LoopingCall(self.leftmotor.move_cw, 8)
+	    self.loopingl.start(.01, now=True)
+	    self.loopingr = LoopingCall(self.rightmotor.move_acw, 8)
+	    self.loopingr.start(.01, now=True)
+    
+        elif payload == "stop":
+	    if self.loopingl != None and self.loopingl.running:
 		    self.loopingl.stop()
-		if self.loopingr != None and self.loopingr.running:
-		    self.loopingr.stop()
-	    elif payload == "left":
-		self.loopingl = LoopingCall(self.leftmotor.move_acw, 8)
-		self.loopingl.start(.01, now=True)
-		self.loopingr = LoopingCall(self.rightmotor.move_acw, 8)
-		self.loopingr.start(.01, now=True)
-	    elif payload == "right":
-		self.loopingl = LoopingCall(self.leftmotor.move_cw, 8)
-		self.loopingl.start(.01, now=True)
-		self.loopingr = LoopingCall(self.rightmotor.move_cw, 8)
-		self.loopingr.start(.01, now=True)
-	    elif payload == "reverse":
-		self.loopingl = LoopingCall(self.leftmotor.move_acw, 8)
-		self.loopingl.start(.01, now=True)
-		self.loopingr = LoopingCall(self.rightmotor.move_cw, 8)
-		self.loopingr.start(.01, now=True)
-	    
+	    if self.loopingr != None and self.loopingr.running:
+		self.loopingr.stop()
+	elif payload == "left":
+	    self.loopingl = LoopingCall(self.leftmotor.move_acw, 8)
+	    self.loopingl.start(self.rate, now=True)
+	    self.loopingr = LoopingCall(self.rightmotor.move_acw, 8)
+	    self.loopingr.start(self.rate, now=True)
+        elif payload == "right":
+	    self.loopingl = LoopingCall(self.leftmotor.move_cw, 8)
+	    self.loopingl.start(self.rate, now=True)
+	    self.loopingr = LoopingCall(self.rightmotor.move_cw, 8)
+	    self.loopingr.start(self.rate, now=True)
+	elif payload == "reverse":
+	    self.loopingl = LoopingCall(self.leftmotor.move_acw, 8)
+	    self.loopingl.start(self.rate, now=True)
+	    self.loopingr = LoopingCall(self.rightmotor.move_cw, 8)
+	    self.loopingr.start(self.rate, now=True)
+        
         #echo back message verbatim
         self.sendMessage(payload, isBinary)
 
     def onClose(self, wasClean, code, reason):
         print("WebSocket connection closed: {0}".format(reason))
-	GPIO.cleanup()
+    GPIO.cleanup()
 
 if __name__ == '__main__':
 
