@@ -8,8 +8,10 @@ Get IP address with <code>hostname -I</code> this is the address of the website 
 
 Instructions to get code working (sudo needed because gpio pins require super user)
 
-<code>sudo pip install -r requirements.txt
-sudo python control_server.py
-sudo python app.py</code>
+<code>sudo pip install -r requirements.txt</code>
+
+<code>sudo python control_server.py</code>
+
+<code>sudo python app.py</code>
 
 Credit to Miguel Grinberg for his awesome tutorial on streaming video with flask. 
