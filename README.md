@@ -10,7 +10,7 @@ Instructions to get code working (sudo needed because gpio pins require super us
 
 <code>sudo pip install -r requirements.txt</code>
 
-<code>sudo python control_server.py</code>
+<code>sudo python control_server.py &</code>
 
 <code>sudo python app.py</code>
 
