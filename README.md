@@ -15,3 +15,5 @@ Instructions to get code working (sudo needed because gpio pins require super us
 <code>sudo python app.py</code>
 
 Credit to Miguel Grinberg for his awesome tutorial on streaming video with flask. 
+
+Credit to Stephen C Phillips for code to control the stepper motors. 
